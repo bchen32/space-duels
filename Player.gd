@@ -59,21 +59,39 @@ func roll_align():
 	var rotation_plane = Plane(Vector3(), facing, direction)
 	if rotation_plane.normal.is_equal_approx(Vector3()):
 		return Vector3(PI, 0, 0)
-	var roll_angle1 = signed_angle(transform.basis.x, rotation_plane.normal, facing)
-	var roll_angle2 = signed_angle(-transform.basis.x, rotation_plane.normal, facing)
-	var roll_angle3 = signed_angle(transform.basis.z, rotation_plane.normal, facing)
-	var roll_angle4 = signed_angle(-transform.basis.z, rotation_plane.normal, facing)
-	var abs1 = abs(roll_angle1)
-	var abs2 = abs(roll_angle2)
-	var abs3 = abs(roll_angle3)
-	var abs4 = abs(roll_angle4)
-	var y_angle = roll_angle4
-	if abs1 <= abs2 && abs1 <= abs3 && abs1 <= abs4:
-		y_angle = roll_angle1
-	if abs2 <= abs1 && abs2 <= abs3 && abs2 <= abs4:
-		y_angle = roll_angle2
-	if abs3 <= abs1 && abs3 <= abs2 && abs3 <= abs4:
-		y_angle = roll_angle3
+	var roll_angles = []
+	roll_angles.append(signed_angle(transform.basis.x, rotation_plane.normal, facing))
+	roll_angles.append(signed_angle(-transform.basis.x, rotation_plane.normal, facing))
+	roll_angles.append(signed_angle(transform.basis.z, rotation_plane.normal, facing))
+	roll_angles.append(signed_angle(-transform.basis.z, rotation_plane.normal, facing))
+#	var abs1 = abs(roll_angle1)
+#	var abs2 = abs(roll_angle2)
+#	var abs3 = abs(roll_angle3)
+#	var abs4 = abs(roll_angle4)
+#	var y_angle = roll_angle4
+#	if abs1 <= abs2 && abs1 <= abs3 && abs1 <= abs4:
+#		y_angle = roll_angle1
+#	if abs2 <= abs1 && abs2 <= abs3 && abs2 <= abs4:
+#		y_angle = roll_angle2
+#	if abs3 <= abs1 && abs3 <= abs2 && abs3 <= abs4:
+#		y_angle = roll_angle3
+	var time_floats = []
+	for i in range(4):
+		var time_accel = abs(angular_velocity.y / turn_accel.y)
+		var distance_accel = 0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
+		if angular_velocity.y > 0:
+	#		need negative accel to stop
+			distance_accel = -0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
+		var distance_float = fposmod(roll_angles[i] - distance_accel, -2 * PI)
+		if angular_velocity.y > 0:
+			distance_float = fposmod(roll_angles[i] - distance_accel, 2 * PI)
+		var time_float = distance_float / angular_velocity.y
+		time_floats.append(time_float)
+	var min_time_float = time_floats[0]
+	for i in range(4):
+		min_time_float = min(min_time_float, time_floats[i])
+	return min_time_float
+	
 	
 	
 	
