@@ -15,6 +15,9 @@ export var crosshair = preload("res://assets/Crosshair.png")
 var velocity = Vector3()
 var angular_velocity = Vector3()
 
+var stop_step = 0
+# 0 is stopping non roll rotation, 1 is aligning roll, 2 is aligning pitch/yaw, 3 is thrusting in opposite direction
+
 func signed_angle(from, to, up):
 #	signed angle between 2 vectors using the 3rd as the 'up' vector
 	if from.cross(to).dot(up) < 0:
@@ -133,39 +136,30 @@ func _physics_process(delta):
 			angular_velocity.y += -turn_accel.y * delta
 	if Input.is_action_pressed("thrust"):
 		if Input.is_action_pressed("stop_modifier"):
-			if transform.basis.y.is_equal_approx(-velocity.normalized()):
-#				aligned properly
-				if !velocity.is_equal_approx(Vector3()):
-#					thrust
-					velocity += transform.basis.y * accel * delta
-			else:
-#				turn
-				var angles = full_stop()
-				if abs(angles.y) > 0:
-#					stop pitch/yaw then align roll
-					if is_equal_approx(angular_velocity.x, 0) and is_equal_approx(angular_velocity.z, 0):
-#						align roll
-						var y_angle = angles.y
-						var time_accel = abs(angular_velocity.y / turn_accel.y)
-						var distance_accel = 0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
-						if angular_velocity.y > 0:
-#							need negative accel to stop
-							distance_accel = -0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
-						var distance_float = fposmod(y_angle - distance_accel, -2 * PI)
-						if angular_velocity.y > 0:
-							distance_float = fposmod(y_angle - distance_accel, 2 * PI)
-						var time_float = distance_float / angular_velocity.y
-						print(angles.y * 180 / PI)
-						print(distance_accel * 180 / PI)
-						print(angular_velocity.y)
-						print(time_float)
-						print('--------------')
-						if time_float <= 0:
-							angular_velocity.y += stop(angular_velocity.y, turn_accel.y * delta)
-					else:
-#						stop non roll velocity
+			if !velocity.is_equal_approx(Vector3()):
+				if stop_step == 0:
+#					stop non roll velocity
+					if !is_equal_approx(angular_velocity.x, 0) or !is_equal_approx(angular_velocity.z, 0):
 						angular_velocity.x += stop(angular_velocity.x, turn_accel.x * delta)
 						angular_velocity.z += stop(angular_velocity.z, turn_accel.z * delta)
+					else:
+						stop_step = 1
+				if stop_step == 1:
+#					align roll
+					if !is_equal_approx(angular_velocity.y, 0):
+						var time_float = roll_align()
+						if time_float <= delta:
+							angular_velocity.y += stop(angular_velocity.y, turn_accel.y * delta)
+					else:
+						stop_step = 2
+						var angles = full_stop()
+						rotate_object_local(Vector3(0, 1, 0), angles.y)
+				if stop_step == 2:
+#					align pitch/yaw
+					print()
+				if stop_step == 3:
+#					thrust
+					velocity += transform.basis.y * accel * delta
 		else:
 			velocity += transform.basis.y * accel * delta
 	if Input.is_action_pressed("ui_cancel"):
