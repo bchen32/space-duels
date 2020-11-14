@@ -78,22 +78,38 @@ func roll_align():
 #		y_angle = roll_angle2
 #	if abs3 <= abs1 && abs3 <= abs2 && abs3 <= abs4:
 #		y_angle = roll_angle3
-	var time_floats = []
+
+#	var time_floats = []
+#	for i in range(4):
+#		var time_accel = abs(angular_velocity.y / turn_accel.y)
+#		var distance_accel = 0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
+#		if angular_velocity.y > 0:
+#	#		need negative accel to stop
+#			distance_accel = -0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
+#		var distance_float = fposmod(roll_angles[i] - distance_accel, -2 * PI)
+#		if angular_velocity.y > 0:
+#			distance_float = fposmod(roll_angles[i] - distance_accel, 2 * PI)
+#		var time_float = distance_float / angular_velocity.y
+#		time_floats.append(time_float)
+#	var min_time_float = time_floats[0]
+#	for i in range(4):
+#		min_time_float = min(min_time_float, time_floats[i])
+#	return min_time_float
+	var time_accels = []
 	for i in range(4):
 		var time_accel = abs(angular_velocity.y / turn_accel.y)
 		var distance_accel = 0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
 		if angular_velocity.y > 0:
-	#		need negative accel to stop
+#			need negative accel to stop
 			distance_accel = -0.5 * turn_accel.y * time_accel * time_accel + angular_velocity.y * time_accel
+		var modded_roll_angle = [0, 0]
+		modded_roll_angle[0] = ceil((distance_accel - roll_angles[i]) / (2 * PI))
+		modded_roll_angle[1] = floor((distance_accel - roll_angles[i]) / (2 * PI))
 		var distance_float = fposmod(roll_angles[i] - distance_accel, -2 * PI)
 		if angular_velocity.y > 0:
 			distance_float = fposmod(roll_angles[i] - distance_accel, 2 * PI)
-		var time_float = distance_float / angular_velocity.y
-		time_floats.append(time_float)
-	var min_time_float = time_floats[0]
-	for i in range(4):
-		min_time_float = min(min_time_float, time_floats[i])
-	return min_time_float
+			
+		var transition_velocity = sqrt((-2 * turn_accel.y * roll_angles[i] - angular_velocity.y * angular_velocity.y) / (-2))
 	
 	
 	
@@ -162,6 +178,8 @@ func _physics_process(delta):
 					velocity += transform.basis.y * accel * delta
 		else:
 			velocity += transform.basis.y * accel * delta
+	if !(Input.is_action_pressed("thrust") and Input.is_action_pressed("stop_modifier")):
+		stop_step = 0
 	if Input.is_action_pressed("ui_cancel"):
 		velocity = Vector3()
 		angular_velocity = Vector3()
