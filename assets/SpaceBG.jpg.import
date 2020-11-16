@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/SpaceBG.jpg-6e511d45c3dbb26ef220f191c8068980.stex"
+path="res://.import/SpaceBG.jpg-d10775b604f908bf433816d022c733d5.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/SpaceBG.jpg"
-dest_files=[ "res://.import/SpaceBG.jpg-6e511d45c3dbb26ef220f191c8068980.stex" ]
+source_file="res://Assets/SpaceBG.jpg"
+dest_files=[ "res://.import/SpaceBG.jpg-d10775b604f908bf433816d022c733d5.stex" ]
 
 [params]
 

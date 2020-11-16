@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/Spaceship.glb-d8d554994c8977082fc3a2491d906123.scn"
+path="res://.import/Spaceship.glb-9aee6b87befc653a3de559ab2cfdc905.scn"
 
 [deps]
 
-source_file="res://assets/Spaceship.glb"
-dest_files=[ "res://.import/Spaceship.glb-d8d554994c8977082fc3a2491d906123.scn" ]
+source_file="res://Assets/Spaceship.glb"
+dest_files=[ "res://.import/Spaceship.glb-9aee6b87befc653a3de559ab2cfdc905.scn" ]
 
 [params]
 
