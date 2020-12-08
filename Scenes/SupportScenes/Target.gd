@@ -12,4 +12,4 @@ func _process(delta):
 	if health <= 0:
 		print('Dead')
 		queue_free()
-	move_and_collide(velocity * delta)
+	var _move_collision = move_and_collide(velocity * delta)

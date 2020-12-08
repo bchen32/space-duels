@@ -14,3 +14,5 @@ func _physics_process(_delta):
 		$Player/Camera.current = true
 	if Input.is_action_pressed('ui_down'):
 		$OutCam.current = true
+	if Input.is_action_just_pressed('ui_cancel'):
+		var _error = get_tree().reload_current_scene()
