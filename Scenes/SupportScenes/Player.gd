@@ -1,4 +1,4 @@
-extends RigidBody
+extends KinematicBody
 
 # debug vars
 var frame_counter = 0
@@ -6,15 +6,15 @@ var frame_counter = 0
 export var damage = 1
 export var height = 8.5
 export var radius = 1
-#export var mass = 1000
+export var mass = 1000
 export var thrust = 50000
-export var torque = 10000
-#var moment_inertia = Vector3(0.25 * mass * radius * radius + mass * height * height / 12, 0.5 * mass * radius * radius, 0.25 * mass * radius * radius + mass * height * height / 12)
-#var accel = thrust / mass
-#var turn_accel = torque / moment_inertia
+export var torque = Vector3(10000, 1000, 10000)
+var moment_inertia = Vector3(0.25 * mass * radius * radius + mass * height * height / 12, 0.5 * mass * radius * radius, 0.25 * mass * radius * radius + mass * height * height / 12)
+var accel = thrust / mass
+var turn_accel = torque / moment_inertia
 
 var velocity = Vector3()
-#var angular_velocity = Vector3()
+var angular_velocity = Vector3()
 
 onready var crosshair_circle = $CrosshairCircle
 onready var crosshair_cross = $CrosshairCross
@@ -36,33 +36,7 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	pass
 
-func _integrate_forces(_state):
-	if Input.is_action_pressed('pitch_up'):
-		add_torque(transform.basis.x * torque)
-	if Input.is_action_pressed('pitch_down'):
-		add_torque(-transform.basis.x * torque)
-	if Input.is_action_pressed('yaw_left'):
-		add_torque(transform.basis.z * torque)
-	if Input.is_action_pressed('yaw_right'):
-		add_torque(-transform.basis.z * torque)
-	if Input.is_action_just_pressed('roll_cw'):
-#		add_torque(transform.basis.y * torque)
-		apply_torque_impulse(transform.basis.y * torque * 2)
-	if Input.is_action_just_pressed('roll_ccw'):
-#		add_torque(-transform.basis.y * torque)
-		apply_torque_impulse(-transform.basis.y * torque * 2)
-#	debug prints
-	if frame_counter == 10:
-		print('Rotation: %s' % angular_velocity)
-#		print('Basis Y: %s' % transform.basis.y)
-		frame_counter = 0
-	frame_counter += 1
-
-
-	if Input.is_action_pressed('thrust'):
-		add_central_force(transform.basis.y * thrust)
-
-func _physics_process(_delta):
+func _physics_process(delta):
 #	shooting area
 	for laser in lasers:
 		laser.visible = false
@@ -91,69 +65,41 @@ func _physics_process(_delta):
 			if body == self:
 				continue
 			body.health -= damage
-#	if Input.is_action_pressed('pitch_up'):
-#		angular_velocity += transform.basis.x * turn_accel.x * delta
-#	if Input.is_action_pressed('pitch_down'):
-#		angular_velocity -= transform.basis.x * turn_accel.x * delta
-##		angular_velocity -= angular_velocity.project(transform.basis.x)
-##		angular_velocity.x = 0
-#	if Input.is_action_pressed('yaw_left'):
-#		angular_velocity += transform.basis.z * turn_accel.z * delta
-#	if Input.is_action_pressed('yaw_right'):
-#		angular_velocity -= transform.basis.z * turn_accel.z * delta
-##		angular_velocity -= angular_velocity.project(transform.basis.z)
-##		angular_velocity.y = 0
-#	if Input.is_action_pressed('roll_cw'):
-#		angular_velocity += transform.basis.y * turn_accel.y * delta
-#	if Input.is_action_pressed('roll_ccw'):
-#		angular_velocity -= transform.basis.y * turn_accel.y * delta
-##		angular_velocity -= angular_velocity.project(transform.basis.y)
-##		angular_velocity.y = 0
+	if Input.is_action_pressed('pitch_up'):
+		angular_velocity += transform.basis.x * turn_accel.x * delta
+	if Input.is_action_pressed('pitch_down'):
+		angular_velocity -= transform.basis.x * turn_accel.x * delta
+	if Input.is_action_pressed('yaw_left'):
+		angular_velocity += transform.basis.z * turn_accel.z * delta
+	if Input.is_action_pressed('yaw_right'):
+		angular_velocity -= transform.basis.z * turn_accel.z * delta
+	if Input.is_action_pressed('roll_cw'):
+		angular_velocity += transform.basis.y * turn_accel.y * delta
+	if Input.is_action_pressed('roll_ccw'):
+		angular_velocity -= transform.basis.y * turn_accel.y * delta
 
-#	if Input.is_action_just_pressed('pitch_up'):
-#		angular_velocity += transform.basis.x
-#	if Input.is_action_just_pressed('pitch_down'):
-#		angular_velocity -= transform.basis.x
-#	if Input.is_action_just_pressed('yaw_left'):
-#		angular_velocity += transform.basis.z
-#	if Input.is_action_just_pressed('yaw_right'):
-#		angular_velocity -= transform.basis.z
-#	if Input.is_action_just_pressed('roll_cw'):
-#		angular_velocity += 10 * transform.basis.y
-#	if Input.is_action_just_pressed('roll_ccw'):
-#		angular_velocity -= 10 * transform.basis.y
-#
-#
-#	if Input.is_action_pressed('thrust'):
-#		velocity += transform.basis.y * accel * delta
-#	if Input.is_action_pressed('ui_cancel'):
-#		velocity = Vector3()
-#		angular_velocity = Vector3()
-#		transform = Transform.IDENTITY
-		
-	# debug stops
-	if Input.is_action_pressed('debug_x'):
-		angular_velocity.x = 0
-	if Input.is_action_pressed('debug_y'):
-		angular_velocity.y = 0
-	if Input.is_action_pressed('debug_z'):
-		angular_velocity.z = 0
+	if Input.is_action_pressed('thrust'):
+		velocity += transform.basis.y * accel * delta
+	if Input.is_action_pressed('ui_cancel'):
+		velocity = Vector3()
+		angular_velocity = Vector3()
+		transform = Transform.IDENTITY
 
-	# debug prints
-#	if frame_counter == 10:
-#		print('Rotation: %s' % angular_velocity)
-#		print('Basis Y: %s' % transform.basis.y)
-#		frame_counter = 0
-#	frame_counter += 1
+#	debug prints
+	if frame_counter == 10:
+		print('Rotation: %s' % angular_velocity)
+		print('Basis Y: %s' % transform.basis.y)
+		frame_counter = 0
+	frame_counter += 1
 
-#	var rotation_speed = sqrt(angular_velocity.x * angular_velocity.x + angular_velocity.y * angular_velocity.y + angular_velocity.z * angular_velocity.z)
-#	var rotation_axis = angular_velocity.normalized()
-#	if !angular_velocity.is_equal_approx(Vector3()):
-#		rotate(rotation_axis, rotation_speed * delta)
-#	transform = transform.orthonormalized()
-#	var move_collision = move_and_collide(velocity * delta)
-#	if move_collision:
-#		queue_free()
+	var rotation_speed = sqrt(angular_velocity.x * angular_velocity.x + angular_velocity.y * angular_velocity.y + angular_velocity.z * angular_velocity.z)
+	var rotation_axis = angular_velocity.normalized()
+	if !angular_velocity.is_equal_approx(Vector3()):
+		rotate(rotation_axis, rotation_speed * delta)
+	transform = transform.orthonormalized()
+	var move_collision = move_and_collide(velocity * delta)
+	if move_collision:
+		queue_free()
 
 func _process(_delta):
 	shoot_area_circle.rect_scale = Vector2(get_viewport().size.y / 1080, get_viewport().size.y / 1080)

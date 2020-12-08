@@ -14,10 +14,8 @@ points = PoolVector3Array( 0, 5, 0, 2.5, -2.5, 0, 2, -5, 0, -2, -5, 0, -2.5, -2.
 [sub_resource type="ConvexPolygonShape" id=3]
 points = PoolVector3Array( 0, 0, 0, 12400, 10000, 7000, 12400, 10000, -7000, -12400, 10000, 7000, -12400, 10000, -7000 )
 
-[node name="Player" type="RigidBody"]
+[node name="Player" type="KinematicBody"]
 collision_mask = 7
-mass = 1000.0
-can_sleep = false
 script = ExtResource( 2 )
 
 [node name="Spaceship" parent="." instance=ExtResource( 1 )]
