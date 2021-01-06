@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="SpaceShooterAuthentication"
+run/main_scene="res://Scenes/MainScenes/Authentication.tscn"
 config/icon="res://icon.png"
 
 [rendering]
