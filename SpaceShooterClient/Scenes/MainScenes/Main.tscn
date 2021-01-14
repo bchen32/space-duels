@@ -19,14 +19,6 @@ transform = Transform( -1.62921e-07, 0, 1, 0, 1, 0, -1, 0, -1.62921e-07, 20, 0, 
 fov = 90.0
 far = 100000.0
 
-[node name="FPS" type="Label" parent="."]
-margin_right = 100.0
-margin_bottom = 50.0
-custom_colors/font_color = Color( 0.364706, 0.913725, 0.129412, 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="Target1" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0 )
 velocity = Vector3( 0, 10, 0 )

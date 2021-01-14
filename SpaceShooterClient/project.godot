@@ -8,20 +8,15 @@
 
 config_version=4
 
-_global_script_classes=[  ]
-_global_script_class_icons={
-
-}
-
 [application]
 
 config/name="SpaceShooterClient"
-run/main_scene="res://Scenes/MainScenes/Main.tscn"
+run/main_scene="res://Scenes/MainScenes/MainMenu.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
-Server="*res://Scenes/Singletons/Server.gd"
+Globals="*res://Scenes/Singletons/Globals.gd"
 
 [display]
 
