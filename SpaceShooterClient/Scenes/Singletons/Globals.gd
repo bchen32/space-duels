@@ -4,7 +4,6 @@ extends Node
 var owned = false
 var online = false
 var steam_id = 0
-var steam_name = ''
 
 func _ready():
 	var init = Steam.steamInit()
@@ -16,7 +15,6 @@ func _ready():
 	owned = Steam.isSubscribed()
 	online = Steam.loggedOn()
 	steam_id = Steam.getSteamID()
-	steam_name = Steam.getPersonaName()
 	
 	# Check if account owns the game
 	if not owned:
