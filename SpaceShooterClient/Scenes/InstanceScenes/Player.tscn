@@ -43,7 +43,14 @@ collision_layer = 0
 visible = false
 shape = SubResource( 3 )
 
-[node name="CrosshairCircle" type="TextureRect" parent="."]
+[node name="Overlay" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CrosshairCircle" type="TextureRect" parent="Overlay"]
 margin_right = 32.0
 margin_bottom = 32.0
 texture = ExtResource( 5 )
@@ -51,7 +58,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CrosshairCross" type="TextureRect" parent="."]
+[node name="CrosshairCross" type="TextureRect" parent="Overlay"]
 margin_right = 32.0
 margin_bottom = 32.0
 texture = ExtResource( 3 )
@@ -59,7 +66,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ShootAreaCircle" type="TextureRect" parent="."]
+[node name="ShootAreaCircle" type="TextureRect" parent="Overlay"]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

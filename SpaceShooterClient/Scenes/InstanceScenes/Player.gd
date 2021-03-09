@@ -1,7 +1,18 @@
 extends KinematicBody
 
 # debug vars
+export var screenshot_mode = false
 var frame_counter = 0
+
+# nodes
+onready var crosshair_circle = $Overlay/CrosshairCircle
+onready var crosshair_cross = $Overlay/CrosshairCross
+onready var shoot_area_circle = $Overlay/ShootAreaCircle
+onready var camera = $Camera
+onready var shoot_area = $Camera/ShootArea
+onready var vision_area = $Camera/VisionArea
+onready var gun_pivots = [$Spaceship/GunPivotTop, $Spaceship/GunPivotBottom]
+onready var lasers = [$Spaceship/GunPivotTop/LaserTop, $Spaceship/GunPivotBottom/LaserBottom]
 
 # physical characteristics
 export var damage = 1
@@ -10,6 +21,7 @@ export var radius = 1
 export var mass = 1000
 export var thrust = 50000
 export var torque = Vector3(10000, 1000, 10000)
+
 var moment_inertia = Vector3(0.25 * mass * radius * radius + mass * height * height / 12, 0.5 * mass * radius * radius, 0.25 * mass * radius * radius + mass * height * height / 12)
 var accel = thrust / mass
 var turn_accel = torque / moment_inertia
@@ -17,16 +29,6 @@ var turn_accel = torque / moment_inertia
 # vel and angular vel
 var velocity = Vector3(0, 0, 0)
 var angular_velocity = Vector3()
-
-# nodes
-onready var crosshair_circle = $CrosshairCircle
-onready var crosshair_cross = $CrosshairCross
-onready var shoot_area_circle = $ShootAreaCircle
-onready var camera = $Camera
-onready var shoot_area = $Camera/ShootArea
-onready var vision_area = $Camera/VisionArea
-onready var gun_pivots = [$Spaceship/GunPivotTop, $Spaceship/GunPivotBottom]
-onready var lasers = [$Spaceship/GunPivotTop/LaserTop, $Spaceship/GunPivotBottom/LaserBottom]
 
 var enemy_marker_scene = preload('res://Scenes/InstanceScenes/EnemyMarker.tscn')
 var enemy_markers = []
@@ -45,6 +47,8 @@ func look_at_no_spin(eye, target):
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
+	if screenshot_mode:
+		$Overlay.hide()
 	pass
 
 func _physics_process(delta):
@@ -153,17 +157,12 @@ func _physics_process(delta):
 			enemy_marker.rect_size = Vector2(50, 50)
 			enemy_marker.rect_position = enemy_coord - (enemy_marker.rect_size / 2)
 			enemy_markers.append(enemy_marker)
-			add_child(enemy_marker)
+			if !screenshot_mode:
+				add_child(enemy_marker)
 
 func _process(_delta):
 #	constrain crosshair
-	shoot_area_circle.rect_scale = Vector2(get_viewport().size.y / 1080, get_viewport().size.y / 1080)
-	shoot_area_circle.margin_left = -shoot_area_circle.rect_scale.x * shoot_area_circle.rect_size.x / 2
-	shoot_area_circle.margin_right = shoot_area_circle.rect_scale.x * shoot_area_circle.rect_size.x / 2
-	shoot_area_circle.margin_top = -shoot_area_circle.rect_scale.x * shoot_area_circle.rect_size.x / 2
-	shoot_area_circle.margin_bottom = shoot_area_circle.rect_scale.x * shoot_area_circle.rect_size.x / 2
 	var mouse_pos = get_viewport().get_mouse_position()
-	crosshair_circle.rect_position = (mouse_pos - (get_viewport().size / 2) + (crosshair_circle.rect_size / 2)).clamped(get_viewport().size.y / 16) + (get_viewport().size / 2) - (crosshair_circle.rect_size / 2)
+	var viewport_size = get_viewport().get_visible_rect().size
+	crosshair_circle.rect_position = (mouse_pos - (viewport_size / 2) + (crosshair_circle.rect_size / 2)).clamped(viewport_size.y / 16) + (viewport_size / 2) - (crosshair_circle.rect_size / 2)
 	crosshair_cross.rect_position = mouse_pos
-	
-	

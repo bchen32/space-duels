@@ -21,15 +21,12 @@ far = 100000.0
 
 [node name="Target1" parent="." instance=ExtResource( 4 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 0 )
-velocity = Vector3( 0, 10, 0 )
 
 [node name="Target2" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10 )
-velocity = Vector3( 0, 0, 25 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 8 )
 
 [node name="Target3" parent="." instance=ExtResource( 4 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0 )
-velocity = Vector3( 25, 0, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, -8 )
 
 [node name="Asteroid" parent="." instance=ExtResource( 5 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, 0 )
