@@ -1,17 +1,19 @@
 extends Spatial
 
-onready var join_button = $UI/VBoxContainer/HBoxContainer/VBoxContainer/Join
-onready var create_button = $UI/VBoxContainer/HBoxContainer/VBoxContainer/Create
-onready var quit_button = $UI/VBoxContainer/HBoxContainer/VBoxContainer/Quit
+onready var join_button = $UI/Column/Row/Column/Join
+onready var create_button = $UI/Column/Row/Column/Create
+onready var quit_button = $UI/Column/Row/Column/Quit
+
 onready var quit_prompt = $UI/QuitPrompt
-onready var quit_confirm = $UI/QuitPrompt/VBoxContainer/HBoxContainer/Quit
-onready var quit_cancel = $UI/QuitPrompt/VBoxContainer/HBoxContainer/Cancel
+onready var quit_confirm = $UI/QuitPrompt/Column/Row/Confirm
+onready var quit_cancel = $UI/QuitPrompt/Column/Row/Cancel
 
 
 export var join_scene_path = 'res://Scenes/RunnableScenes/JoinMenu.tscn'
 export var create_scene_path = 'res://Scenes/RunnableScenes/CreateMenu.tscn'
 
 func _ready():
+#	buttons
 	join_button.connect('pressed', self, '_on_join_pressed')
 	create_button.connect('pressed', self, '_on_create_pressed')
 	quit_button.connect('pressed', self, '_on_quit_pressed')
@@ -20,13 +22,7 @@ func _ready():
 
 func _input(event):
 	if event.is_action_released('ui_cancel'):
-		toggle_quit_prompt()
-
-func toggle_quit_prompt():
-	if !quit_prompt.visible:
-		quit_prompt.popup()
-	else:
-		quit_prompt.hide()
+		Globals.toggle_prompt(quit_prompt)
 
 func _on_join_pressed():
 	print('Join')
@@ -37,10 +33,10 @@ func _on_create_pressed():
 	get_tree().change_scene(create_scene_path)
 
 func _on_quit_pressed():
-	toggle_quit_prompt()
+	Globals.toggle_prompt(quit_prompt)
 
 func _on_quit_confirm_pressed():
 	get_tree().quit()
 
 func _on_quit_cancel_pressed():
-	quit_prompt.hide()
+	Globals.toggle_prompt(quit_prompt)

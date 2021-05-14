@@ -2,9 +2,9 @@ extends Spatial
 
 enum lobby_visibility {private, friends, public, invisible}
 
-onready var public_button = $UI/VBoxContainer/HBoxContainier/VBoxContainer/Public
-onready var private_button = $UI/VBoxContainer/HBoxContainier/VBoxContainer/Private
-onready var back_button = $UI/VBoxContainer/Back
+onready var public_button = $UI/Column/Row/Column/Public
+onready var private_button = $UI/Column/Row/Column/Private
+onready var back_button = $UI/Column/Back
 
 var publicity = ''
 var max_players = 2
@@ -16,10 +16,6 @@ func _ready():
 	public_button.connect('pressed', self, '_on_public_pressed')
 	private_button.connect('pressed', self, '_on_private_pressed')
 	back_button.connect('pressed', self, '_on_back_pressed')
-
-func _input(event):
-	if event.is_action_released('ui_cancel'):
-		Globals.go_back()
 
 func create_lobby():
 	if Globals.lobby_id == 0:
@@ -35,6 +31,10 @@ func _on_lobby_created(connect, lobby_id):
 		print('Allowing Steam to be relay backup: ' + str(relay))
 		print(Steam.getLobbyData(lobby_id, 'publicity'))
 		Globals.go_lobby()
+
+func _input(event):
+	if event.is_action_released('ui_cancel'):
+		Globals.go_back()
 
 func _on_public_pressed():
 	publicity = 'public'
