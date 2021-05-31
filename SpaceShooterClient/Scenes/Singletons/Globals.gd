@@ -15,8 +15,6 @@ var p2p_channel = 0
 # scene paths
 export var main_menu_path = 'res://Scenes/RunnableScenes/MainMenu.tscn'
 export var lobby_menu_path = 'res://Scenes/RunnableScenes/LobbyMenu.tscn'
-export var join_menu_script_path = 'res://Scenes/RunnableScenes/JoinMenu.gd'
-var join_menu_script = load(join_menu_script_path)
 
 func _ready():
 	var init = Steam.steamInit()
@@ -33,7 +31,9 @@ func _ready():
 	if not owned:
 		print('Game not owned')
 		get_tree().quit()
-	Steam.connect('join_requested', self, 'on_join_requested')
+	# steam signals
+	Steam.connect('join_requested', self, '_on_join_requested')
+	Steam.connect('lobby_joined', self, '_on_lobby_joined')
 	check_command_line()
 
 # utility functions
@@ -67,9 +67,12 @@ func check_command_line():
 		for arg in cmd_args:
 			print('Command line: ' + str(arg))
 			if lobby_invite_arg:
-				join_menu_script.join_lobby(int(arg))
+				join_lobby(int(arg))
 			if arg == '+connect_lobby':
 				lobby_invite_arg = true
+
+func join_lobby(new_lobby_id):
+	Steam.joinLobby(new_lobby_id)
 
 func leave_lobby():
 	if lobby_id != 0:
@@ -115,7 +118,17 @@ func send_p2p_packet(send_type, packet_data):
 func _on_join_requested(join_lobby_id, friend_id):
 	var host_name = Steam.getFriendPersonaName(friend_id)
 	print('Joining ' + str(host_name))
-	join_menu_script.join_lobby(join_lobby_id)
+	join_lobby(join_lobby_id)
+
+func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
+	if response != 1:
+		Globals.alert('Unsuccessful, please check the join code', 'Error')
+		return
+	lobby_id = new_lobby_id
+#	get enemy id
+	lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
+	make_p2p_handshake()
+	go_lobby()
 
 func _process(_delta):
 	Steam.run_callbacks()

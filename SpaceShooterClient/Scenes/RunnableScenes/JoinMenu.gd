@@ -11,7 +11,6 @@ onready var back_button = $UI/Column/Back
 func _ready():
 #	steam
 	Steam.connect('lobby_match_list', self, '_on_lobby_match_list')
-	Steam.connect('lobby_joined', self, '_on_lobby_joined')
 #	buttons
 	refresh_button.connect('pressed', self, '_on_refresh_pressed')
 	join_button.connect('pressed', self, '_on_join_pressed')
@@ -21,14 +20,11 @@ func _ready():
 #	search for lobbies
 	refresh_lobby_list()
 
-func join_lobby(lobby_id):
-	Steam.joinLobby(lobby_id)
-
 func join_private():
 	var lobby_id = join_code.get_text()
 	if lobby_id.is_valid_integer(): 
 		lobby_id = int(lobby_id)
-		join_lobby(lobby_id)
+		Globals.join_lobby(lobby_id)
 	else:
 		Globals.alert('Code must be a number', 'Error')
 	join_code.clear()
@@ -51,16 +47,6 @@ func _on_lobby_match_list(lobbies):
 		lobby_button.set_text(host_name)
 		lobby_button.connect('pressed', self, 'join_lobby', [lobby_id])
 		lobby_list.add_child(lobby_button)
-
-func _on_lobby_joined(lobby_id, _permissions, _locked, response):
-	if response != 1:
-		Globals.alert('Unsuccessful, please check the join code', 'Error')
-		return
-	Globals.lobby_id = lobby_id
-#	get enemy id
-	Globals.lobby_enemy_id = Steam.getLobbyMemberByIndex(Globals.lobby_id, 0)
-	Globals.make_p2p_handshake()
-	Globals.go_lobby()
 
 func _on_refresh_pressed():
 	refresh_lobby_list()
