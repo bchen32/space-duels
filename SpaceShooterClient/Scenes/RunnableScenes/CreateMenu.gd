@@ -24,6 +24,7 @@ func create_lobby():
 func _on_lobby_created(connect, lobby_id):
 	if connect == 1:
 		Globals.lobby_id = lobby_id
+		Globals.host = true
 		print('Created a lobby: ' + str(Globals.lobby_id))
 		Steam.setLobbyData(lobby_id, 'host_name', Globals.steam_name)
 		Steam.setLobbyData(lobby_id, 'publicity', publicity)

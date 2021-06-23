@@ -9,12 +9,14 @@ var steam_name = ''
 # lobby vars
 var lobby_id = 0
 var lobby_enemy_id = 0
+var host = false
 
 var p2p_channel = 0
 
 # scene paths
 export var main_menu_path = 'res://Scenes/RunnableScenes/MainMenu.tscn'
 export var lobby_menu_path = 'res://Scenes/RunnableScenes/LobbyMenu.tscn'
+export var main_path = 'res://Scenes/RunnableScenes/Main.tscn'
 
 func _ready():
 	var init = Steam.steamInit()
@@ -42,6 +44,9 @@ func go_back():
 
 func go_lobby():
 	get_tree().change_scene(lobby_menu_path)
+
+func go_main():
+	get_tree().change_scene(main_path)
 
 func toggle_prompt(prompt):
 	if !prompt.visible:
@@ -121,14 +126,16 @@ func _on_join_requested(join_lobby_id, friend_id):
 	join_lobby(join_lobby_id)
 
 func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
-	if response != 1:
-		Globals.alert('Unsuccessful, please check the join code', 'Error')
-		return
-	lobby_id = new_lobby_id
-#	get enemy id
-	lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
-	make_p2p_handshake()
-	go_lobby()
+	if !host:
+		print('Joined')
+		if response != 1:
+			Globals.alert('Unsuccessful, please check the join code', 'Error')
+			return
+		lobby_id = new_lobby_id
+	#	get enemy id
+		lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
+		make_p2p_handshake()
+		go_lobby()
 
 func _process(_delta):
 	Steam.run_callbacks()
