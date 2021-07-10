@@ -9,15 +9,15 @@ onready var join_button = $UI/Column/Row/Join
 onready var back_button = $UI/Column/Back
 
 func _ready():
-#	steam
+#	Steam
 	Steam.connect('lobby_match_list', self, '_on_lobby_match_list')
-#	buttons
+#	Buttons
 	refresh_button.connect('pressed', self, '_on_refresh_pressed')
 	join_button.connect('pressed', self, '_on_join_pressed')
 	back_button.connect('pressed', self, '_on_back_pressed')
-#	other signals
+#	Other signals
 	join_code.connect('text_entered', self, '_on_join_entered')
-#	search for lobbies
+#	Search for lobbies
 	refresh_lobby_list()
 
 func join_private():
@@ -45,7 +45,7 @@ func _on_lobby_match_list(lobbies):
 		var host_name = Steam.getLobbyData(lobby_id, 'host_name')
 		var lobby_button = Button.new()
 		lobby_button.set_text(host_name)
-		lobby_button.connect('pressed', self, 'join_lobby', [lobby_id])
+		lobby_button.connect('pressed', Globals, 'join_lobby', [lobby_id])
 		lobby_list.add_child(lobby_button)
 
 func _on_refresh_pressed():

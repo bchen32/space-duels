@@ -1,19 +1,17 @@
 extends Node
 
-# steam variables
-var owned = false
-var online = false
+# Steam variables
 var steam_id = 0
 var steam_name = ''
 
-# lobby vars
+# Lobby vars
 var lobby_id = 0
 var lobby_enemy_id = 0
 var host = false
 
 var p2p_channel = 0
 
-# scene paths
+# Scene paths
 export var main_menu_path = 'res://Scenes/RunnableScenes/MainMenu.tscn'
 export var lobby_menu_path = 'res://Scenes/RunnableScenes/LobbyMenu.tscn'
 export var main_path = 'res://Scenes/RunnableScenes/Main.tscn'
@@ -25,20 +23,14 @@ func _ready():
 		print('Failed to initialize Steam. ' + str(init['verbal']))
 		get_tree().quit()
 	print('Initialized')
-	owned = Steam.isSubscribed()
-	online = Steam.loggedOn()
 	steam_id = Steam.getSteamID()
 	steam_name = Steam.getPersonaName()
-	# Check if account owns the game
-	if not owned:
-		print('Game not owned')
-		get_tree().quit()
-	# steam signals
+	# Steam signals
 	Steam.connect('join_requested', self, '_on_join_requested')
 	Steam.connect('lobby_joined', self, '_on_lobby_joined')
 	check_command_line()
 
-# utility functions
+# Utility functions
 func go_back():
 	get_tree().change_scene(main_menu_path)
 
@@ -64,7 +56,7 @@ func alert(text, title):
 	scene_tree.current_scene.add_child(dialog)
 	dialog.popup_centered()
 
-# steam functions
+# Steam functions
 func check_command_line():
 	var cmd_args = OS.get_cmdline_args()
 	var lobby_invite_arg = false
@@ -85,6 +77,7 @@ func leave_lobby():
 		Steam.closeP2PSessionWithUser(lobby_enemy_id)
 		lobby_id = 0
 		lobby_enemy_id = 0
+		host = false
 		print('Lobby left, p2p closed, IDs reset')
 
 func display_message(chat_box, message):
@@ -119,7 +112,7 @@ func send_p2p_packet(send_type, packet_data):
 	data.append_array(var2bytes(packet_data))
 	Steam.sendP2PPacket(lobby_enemy_id, data, send_type, p2p_channel)
 
-# steam signals
+# Steam signals
 func _on_join_requested(join_lobby_id, friend_id):
 	var host_name = Steam.getFriendPersonaName(friend_id)
 	print('Joining ' + str(host_name))
@@ -132,7 +125,7 @@ func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
 			Globals.alert('Unsuccessful, please check the join code', 'Error')
 			return
 		lobby_id = new_lobby_id
-	#	get enemy id
+#		Get enemy id
 		lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
 		make_p2p_handshake()
 		go_lobby()

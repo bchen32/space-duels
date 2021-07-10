@@ -12,21 +12,21 @@ onready var send_button = $UI/Column/BottomRow/Send
 onready var start_button = $UI/Column/TopRow/Start
 
 func _ready():
-#	steam
+#	Steam
 	Steam.connect('lobby_message', self, '_on_lobby_message')
 	Steam.connect('lobby_chat_update', self, '_on_lobby_update')
 	Steam.connect('p2p_session_request', self, '_on_p2p_session_request')
 	Steam.connect('p2p_session_connect_fail', self, '_on_p2p_session_connect_fail')
-#	buttons
+#	Buttons
 	copy.connect('pressed', self, '_on_copy_pressed')
 	leave_button.connect('pressed', self, '_on_leave_pressed')
 	leave_confirm.connect('pressed', self, '_on_leave_confirm_pressed')
 	leave_cancel.connect('pressed', self, '_on_leave_cancel_pressed')
 	send_button.connect('pressed', self, '_on_send_pressed')
 	start_button.connect('pressed', self, '_on_start_pressed')
-#	other signals
+#	Other signals
 	message_box.connect('text_entered', self, '_on_text_entered')
-#	other
+#	Other
 	lobby_id_label.text = 'Lobby ID: ' + str(Globals.lobby_id) + ' (' + Steam.getLobbyData(Globals.lobby_id, 'publicity') + ')'
 
 func _input(event):
@@ -93,8 +93,12 @@ func _on_send_pressed():
 
 func _on_start_pressed():
 	if Globals.lobby_enemy_id != 0:
+#		Only start if both players are there
 		print(Globals.lobby_enemy_id)
 		Globals.go_main()
+	else:
+#		Otherwise, print an error in chat
+		Globals.display_message(chat_box, 'Both players must be here to start')
 
 func _on_text_entered(_text):
 	Globals.send_message(chat_box, message_box)

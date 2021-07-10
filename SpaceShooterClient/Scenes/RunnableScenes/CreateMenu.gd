@@ -10,9 +10,9 @@ var publicity = ''
 var max_players = 2
 
 func _ready():
-#	steam
+#	Steam
 	Steam.connect('lobby_created', self, '_on_lobby_created')
-#	buttons
+#	Buttons
 	public_button.connect('pressed', self, '_on_public_pressed')
 	private_button.connect('pressed', self, '_on_private_pressed')
 	back_button.connect('pressed', self, '_on_back_pressed')
