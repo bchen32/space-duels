@@ -1,14 +1,15 @@
 extends Spatial
 
+var player_scene = preload('res://Scenes/InstanceScenes/Player.tscn')
+
+
 func _ready():
-	pass
+	var player1 = player_scene.instance()
+	player1.translation = Vector3(100, 0, 0)
+	var player2 = player_scene.instance()
+	player2.translation = Vector3(-100, 0, 0)
+	add_child(player1)
+	add_child(player2)
 
 func _physics_process(_delta):
-	if Input.is_action_pressed('ui_up'):
-		$Player/Camera.current = true
-	if Input.is_action_pressed('ui_down'):
-		$OutCam.current = true
-	if Input.is_action_just_pressed('ui_cancel'):
-		var _error = get_tree().reload_current_scene()
-	if Input.is_action_just_pressed('quit'):
-		get_tree().quit()
+	pass
