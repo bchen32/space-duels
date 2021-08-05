@@ -95,7 +95,7 @@ func _on_start_pressed():
 	if Globals.lobby_enemy_id != 0:
 #		Only start if both players are there
 		print(Globals.lobby_enemy_id)
-		Globals.go_main()
+		Globals.go_main(true)
 	else:
 #		Otherwise, print an error in chat
 		Globals.display_message(chat_box, 'Both players must be here to start')

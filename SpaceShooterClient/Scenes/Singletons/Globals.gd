@@ -9,12 +9,20 @@ var lobby_id = 0
 var lobby_enemy_id = 0
 var host = false
 
+# P2P vars
 var p2p_channel = 0
+var p2p_data = {}
 
 # Scene paths
 export var main_menu_path = 'res://Scenes/RunnableScenes/MainMenu.tscn'
 export var lobby_menu_path = 'res://Scenes/RunnableScenes/LobbyMenu.tscn'
 export var main_path = 'res://Scenes/RunnableScenes/Main.tscn'
+
+# Constants
+const UNRELIABLE = 0
+const UNRELIABLE_NO_DELAY = 0
+const RELIABLE = 2
+const RELIABLE_BUFFER = 3
 
 func _ready():
 	var init = Steam.steamInit()
@@ -37,8 +45,11 @@ func go_back():
 func go_lobby():
 	get_tree().change_scene(lobby_menu_path)
 
-func go_main():
+func go_main(send_start_packet):
 	get_tree().change_scene(main_path)
+	if send_start_packet:
+		send_p2p_packet(RELIABLE, {'type' : 'start', 'from' : steam_id})
+	
 
 func toggle_prompt(prompt):
 	if !prompt.visible:
@@ -51,7 +62,6 @@ func alert(text, title):
 	dialog.dialog_text = text
 	dialog.window_title = title
 	dialog.connect('modal_closed', dialog, 'queue_free')
-	
 	var scene_tree = Engine.get_main_loop()
 	scene_tree.current_scene.add_child(dialog)
 	dialog.popup_centered()
@@ -92,8 +102,9 @@ func send_message(chat_box, message_box):
 		display_message(chat_box, 'Error...message failed to send')
 	message_box.clear()
 
+# P2P functions
 func make_p2p_handshake():
-	send_p2p_packet(2, {'message' : 'handshake', 'from' : steam_id})
+	send_p2p_packet(RELIABLE, {'type' : 'handshake', 'from' : steam_id})
 
 func read_p2p_packet():
 	var packet_size = Steam.getAvailableP2PPacketSize(0)
@@ -105,6 +116,13 @@ func read_p2p_packet():
 #		var packet_code = str(packet.data[0])
 		var readable = bytes2var(packet.data.subarray(1, packet_size - 1))
 		print('Packet: ' + str(readable))
+		if readable['type'] == 'handshake':
+			print('Handshake received')
+		if readable['type'] == 'start':
+			go_main(false)
+			print('Starting...')
+		if readable['type'] == 'player':
+			p2p_data = readable
 
 func send_p2p_packet(send_type, packet_data):
 	var data = PoolByteArray()

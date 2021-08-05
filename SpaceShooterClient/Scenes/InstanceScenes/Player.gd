@@ -157,6 +157,7 @@ func _physics_process(delta):
 			enemy_markers.append(enemy_marker)
 			if !screenshot_mode:
 				add_child(enemy_marker)
+	Globals.send_p2p_packet(1, )
 
 func _process(_delta):
 #	Constrain crosshair
