@@ -1,10 +1,5 @@
 extends KinematicBody
 
-# Debug vars
-export var screenshot_mode = false
-export var debug_prints = false
-var frame_counter = 0
-
 # Nodes
 onready var crosshair_circle = $Overlay/CrosshairCircle
 onready var crosshair_cross = $Overlay/CrosshairCross
@@ -48,7 +43,7 @@ func look_at_no_spin(eye, target):
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
-	if screenshot_mode:
+	if Globals.screenshot_mode:
 		$Overlay.hide()
 	pass
 
@@ -121,11 +116,8 @@ func _physics_process(delta):
 		velocity += transform.basis.y * accel * delta
 
 #	Debug prints
-	if debug_prints:
-		if frame_counter == 10:
-			print(velocity)
-			frame_counter = 0
-		frame_counter += 1
+#	if Globals.verbose_prints and Globals.frame_counter == 0:
+#		print(velocity)
 
 #	Move
 	var rotation_speed = sqrt(angular_velocity.x * angular_velocity.x + angular_velocity.y * angular_velocity.y + angular_velocity.z * angular_velocity.z)
@@ -133,11 +125,13 @@ func _physics_process(delta):
 	if !angular_velocity.is_equal_approx(Vector3()):
 		rotate(rotation_axis, rotation_speed * delta)
 	transform = transform.orthonormalized()
-#	Check collisions
+#	Check collisions and move
 	var move_collision = move_and_collide(velocity * delta)
 	if move_collision:
 		queue_free()
 		print('Ship collide')
+	# Send p2p data
+	Globals.send_p2p_packet(Globals.UNRELIABLE_NO_DELAY, {'type' : 'player', 'transform' : transform})
 #	Mark visible enemies
 	for enemy_marker in enemy_markers:
 		enemy_marker.queue_free()
@@ -155,9 +149,8 @@ func _physics_process(delta):
 			enemy_marker.rect_size = Vector2(50, 50)
 			enemy_marker.rect_position = enemy_coord - (enemy_marker.rect_size / 2)
 			enemy_markers.append(enemy_marker)
-			if !screenshot_mode:
+			if !Globals.screenshot_mode:
 				add_child(enemy_marker)
-	Globals.send_p2p_packet(1, )
 
 func _process(_delta):
 #	Constrain crosshair

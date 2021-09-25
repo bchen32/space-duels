@@ -12,11 +12,19 @@ var host = false
 # P2P vars
 var p2p_channel = 0
 var p2p_data = {}
+var ping = 0
 
 # Scene paths
 export var main_menu_path = 'res://Scenes/RunnableScenes/MainMenu.tscn'
 export var lobby_menu_path = 'res://Scenes/RunnableScenes/LobbyMenu.tscn'
 export var main_path = 'res://Scenes/RunnableScenes/Main.tscn'
+
+# Debug vars
+export var screenshot_mode = false
+export var verbose_prints = true
+export var print_frequency = 10
+var frame_counter = 0
+
 
 # Constants
 const UNRELIABLE = 0
@@ -49,7 +57,6 @@ func go_main(send_start_packet):
 	get_tree().change_scene(main_path)
 	if send_start_packet:
 		send_p2p_packet(RELIABLE, {'type' : 'start', 'from' : steam_id})
-	
 
 func toggle_prompt(prompt):
 	if !prompt.visible:
@@ -103,6 +110,9 @@ func send_message(chat_box, message_box):
 	message_box.clear()
 
 # P2P functions
+func send_ping(send_type, is_sender):
+	send_p2p_packet(send_type, {'type' : 'ping', 'send_type' : send_type, 'is_sender' : is_sender, 'send_time' : OS.get_ticks_msec()})
+
 func make_p2p_handshake():
 	send_p2p_packet(RELIABLE, {'type' : 'handshake', 'from' : steam_id})
 
@@ -115,13 +125,21 @@ func read_p2p_packet():
 #		var packet_id = str(packet.steamIDRemote)
 #		var packet_code = str(packet.data[0])
 		var readable = bytes2var(packet.data.subarray(1, packet_size - 1))
-		print('Packet: ' + str(readable))
-		if readable['type'] == 'handshake':
+#		Debug prints
+		if verbose_prints and frame_counter == 0:
+			print('Packet: ' + str(readable))
+		if readable['type'] == 'ping':
+			if readable['is_sender']:
+				print('Ping received, sending back...')
+				send_ping(readable['send_type'], false)
+			else:
+				print('Round trip ping: ' + str(OS.get_ticks_msec() - readable['send_time']))
+		elif readable['type'] == 'handshake':
 			print('Handshake received')
-		if readable['type'] == 'start':
+		elif readable['type'] == 'start':
 			go_main(false)
 			print('Starting...')
-		if readable['type'] == 'player':
+		elif readable['type'] == 'player':
 			p2p_data = readable
 
 func send_p2p_packet(send_type, packet_data):
@@ -147,6 +165,12 @@ func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
 		lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
 		make_p2p_handshake()
 		go_lobby()
+
+func _physics_process(_delta):
+	# Debug print frequency limiter
+	frame_counter += 1
+	if frame_counter == print_frequency:
+		frame_counter = 0
 
 func _process(_delta):
 	Steam.run_callbacks()

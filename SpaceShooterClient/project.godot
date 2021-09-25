@@ -10,7 +10,6 @@ config_version=4
 
 _global_script_classes=[  ]
 _global_script_class_icons={
-
 }
 
 [application]
@@ -21,7 +20,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Globals="*res://Scenes/Singletons/Globals.gd"
+Globals="*res://Scenes/Singletons/Globals.tscn"
 
 [debug]
 
@@ -94,7 +93,6 @@ file_logging/enable_file_logging=true
 
 [physics]
 
-common/physics_fps=144
 3d/default_gravity=0.0
 3d/default_linear_damp=0.0
 3d/default_angular_damp=0.0
