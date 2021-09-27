@@ -42,10 +42,8 @@ func look_at_no_spin(eye, target):
 	eye.global_transform.basis.y = y_vector
 
 func _ready():
-	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	if Globals.screenshot_mode:
 		$Overlay.hide()
-	pass
 
 func _physics_process(delta):
 #	Create shooting area

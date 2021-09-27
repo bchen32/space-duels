@@ -4,6 +4,7 @@ var player_scene = preload('res://Scenes/InstanceScenes/Player.tscn')
 var enemy_player_scene = preload('res://Scenes/InstanceScenes/EnemyPlayer.tscn')
 
 func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	var player = player_scene.instance()
 	var enemy = enemy_player_scene.instance()
 	if Globals.host:
@@ -15,6 +16,3 @@ func _ready():
 		enemy.translation = Vector3(100, 0, 0)
 	add_child(player)
 	add_child(enemy)
-
-func _physics_process(_delta):
-	pass
