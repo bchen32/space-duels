@@ -1,7 +1,8 @@
 extends Spatial
 
-var player_scene = preload('res://Scenes/InstanceScenes/Player.tscn')
-var enemy_player_scene = preload('res://Scenes/InstanceScenes/EnemyPlayer.tscn')
+var player_scene = preload("res://Scenes/InstanceScenes/Player.tscn")
+var enemy_player_scene = preload("res://Scenes/InstanceScenes/EnemyPlayer.tscn")
+
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
