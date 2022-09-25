@@ -14,7 +14,7 @@ _global_script_class_icons={
 
 [application]
 
-config/name="SpaceDuels"
+config/name="space_duels"
 run/main_scene="res://Scenes/RunnableScenes/MainMenu.tscn"
 config/icon="res://icon.png"
 

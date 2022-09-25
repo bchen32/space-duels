@@ -30,14 +30,14 @@ var enemy_marker_scene = preload('res://Scenes/InstanceScenes/EnemyMarker.tscn')
 var enemy_markers = []
 
 func stop(basis, max_accel):
-#	Smoothly stops ship in case the remaining velocity is not a multiple of the accel
+	# Smoothly stops ship in case the remaining velocity is not a multiple of the accel
 	var projection_factor = basis.dot(angular_velocity) / (basis.length() * basis.length())
 	if projection_factor > 0:
 		return max(-projection_factor, -max_accel)
 	return min(-projection_factor, max_accel)
 
 func look_at_no_spin(eye, target):
-#	Similar to the look at function, but not spinning the object
+	# Similar to the look at function, but not spinning the object
 	var y_vector = target.normalized()
 	eye.global_transform.basis.y = y_vector
 
@@ -46,7 +46,7 @@ func _ready():
 		$Overlay.hide()
 
 func _physics_process(delta):
-#	Create shooting area
+	# Create shooting area
 	for laser in lasers:
 		laser.visible = false
 	var collision_shape = ConvexPolygonShape.new()
@@ -63,10 +63,10 @@ func _physics_process(delta):
 	collision_shape.points = collision_points_octagon
 	shoot_area.get_node('CollisionShape').set_shape(collision_shape)
 	var gun_look_at = camera.project_ray_normal(mouse_pos) * fov_shoot_length * 50
-#	Point guns at target
+	# Point guns at target
 	look_at_no_spin(gun_pivots[0], gun_look_at)
 	look_at_no_spin(gun_pivots[1], gun_look_at)
-#	Controls
+	# Controls
 	if Input.is_action_pressed('fire'):
 		for laser in lasers:
 			laser.visible = true
@@ -74,7 +74,7 @@ func _physics_process(delta):
 		for body in bodies:
 			if body == self or body.get_collision_layer() != 1:
 				continue
-#			Raycast check for visibility
+			# Raycast check for visibility
 			var space_state = get_world().direct_space_state
 			var result = space_state.intersect_ray(camera.global_transform.origin, body.global_transform.origin, [self])
 			if result and result.collider == body:
@@ -113,24 +113,24 @@ func _physics_process(delta):
 	if Input.is_action_pressed('thrust'):
 		velocity += transform.basis.y * accel * delta
 
-#	Debug prints
-#	if Globals.verbose_prints and Globals.frame_counter == 0:
-#		print(velocity)
+	# Debug prints
+	if Globals.verbose_prints and Globals.frame_counter == 0:
+		print(velocity)
 
-#	Move
+	# Move
 	var rotation_speed = sqrt(angular_velocity.x * angular_velocity.x + angular_velocity.y * angular_velocity.y + angular_velocity.z * angular_velocity.z)
 	var rotation_axis = angular_velocity.normalized()
 	if !angular_velocity.is_equal_approx(Vector3()):
 		rotate(rotation_axis, rotation_speed * delta)
 	transform = transform.orthonormalized()
-#	Check collisions and move
+	# Check collisions and move
 	var move_collision = move_and_collide(velocity * delta)
 	if move_collision:
 		queue_free()
 		print('Ship collide')
 	# Send p2p data
 	Globals.send_p2p_packet(Globals.UNRELIABLE_NO_DELAY, {'type' : 'player', 'transform' : transform})
-#	Mark visible enemies
+	# Mark visible enemies
 	for enemy_marker in enemy_markers:
 		enemy_marker.queue_free()
 	enemy_markers = []
@@ -138,7 +138,7 @@ func _physics_process(delta):
 	for body in bodies:
 		if body == self or body.get_collision_layer() != 1:
 			continue
-#		Raycast check for visibility
+		# Raycast check for visibility
 		var space_state = get_world().direct_space_state
 		var result = space_state.intersect_ray(camera.global_transform.origin, body.global_transform.origin, [self])
 		if result and result.collider == body:
@@ -151,7 +151,7 @@ func _physics_process(delta):
 				add_child(enemy_marker)
 
 func _process(_delta):
-#	Constrain crosshair
+	# Constrain crosshair
 	var mouse_pos = get_viewport().get_mouse_position()
 	var viewport_size = get_viewport().get_visible_rect().size
 	crosshair_circle.rect_position = (mouse_pos - (viewport_size / 2) + (crosshair_circle.rect_size / 2)).clamped(viewport_size.y / 16) + (viewport_size / 2) - (crosshair_circle.rect_size / 2)

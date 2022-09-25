@@ -25,7 +25,6 @@ export var verbose_prints = true
 export var print_frequency = 10
 var frame_counter = 0
 
-
 # Constants
 const UNRELIABLE = 0
 const UNRELIABLE_NO_DELAY = 0
@@ -122,10 +121,8 @@ func read_p2p_packet():
 		var packet = Steam.readP2PPacket(packet_size, 0)
 		if packet.empty():
 			print('WARNING: read an empty packet with non-zero size!')
-#		var packet_id = str(packet.steamIDRemote)
-#		var packet_code = str(packet.data[0])
 		var readable = bytes2var(packet.data.subarray(1, packet_size - 1))
-#		Debug prints
+		# Debug prints
 		if verbose_prints and frame_counter == 0:
 			print('Packet: ' + str(readable))
 		if readable['type'] == 'ping':
@@ -161,7 +158,7 @@ func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
 			Globals.alert('Unsuccessful, please check the join code', 'Error')
 			return
 		lobby_id = new_lobby_id
-#		Get enemy id
+		# Get enemy id
 		lobby_enemy_id = Steam.getLobbyMemberByIndex(lobby_id, 0)
 		make_p2p_handshake()
 		go_lobby()

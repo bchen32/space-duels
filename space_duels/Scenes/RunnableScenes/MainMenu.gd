@@ -13,7 +13,7 @@ export var join_scene_path = 'res://Scenes/RunnableScenes/JoinMenu.tscn'
 export var create_scene_path = 'res://Scenes/RunnableScenes/CreateMenu.tscn'
 
 func _ready():
-#	Buttons
+	# Buttons
 	join_button.connect('pressed', self, '_on_join_pressed')
 	create_button.connect('pressed', self, '_on_create_pressed')
 	quit_button.connect('pressed', self, '_on_quit_pressed')
