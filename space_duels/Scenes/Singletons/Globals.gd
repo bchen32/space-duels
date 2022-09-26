@@ -24,6 +24,7 @@ export var screenshot_mode = false
 export var verbose_prints = true
 export var print_frequency = 10
 var frame_counter = 0
+var last_update_time = -1
 
 # Constants
 const UNRELIABLE = 0
@@ -34,11 +35,11 @@ const RELIABLE_BUFFER = 3
 
 func _ready():
 	var init = Steam.steamInit()
-	print(init)
+	print_debug(init)
 	if init["status"] != 1:
-		print("Failed to initialize Steam. " + str(init["verbal"]))
+		print_debug("Failed to initialize Steam. " + str(init["verbal"]))
 		get_tree().quit()
-	print("Initialized")
+	print_debug("Initialized")
 	steam_id = Steam.getSteamID()
 	steam_name = Steam.getPersonaName()
 	# Steam signals
@@ -85,7 +86,7 @@ func check_command_line():
 	var lobby_invite_arg = false
 	if cmd_args.size() > 0:
 		for arg in cmd_args:
-			print("Command line: " + str(arg))
+			print_debug("Command line: " + str(arg))
 			if lobby_invite_arg:
 				join_lobby(int(arg))
 			if arg == "+connect_lobby":
@@ -103,7 +104,7 @@ func leave_lobby():
 		lobby_id = 0
 		lobby_enemy_id = 0
 		host = false
-		print("Lobby left, p2p closed, IDs reset")
+		print_debug("Lobby left, p2p closed, IDs reset")
 
 
 func display_message(chat_box, message):
@@ -121,14 +122,14 @@ func send_message(chat_box, message_box):
 
 
 # P2P functions
-func send_ping(send_type, is_sender):
+func send_ping(send_type, is_sender, send_time = -1):
 	send_p2p_packet(
 		send_type,
 		{
 			"type": "ping",
 			"send_type": send_type,
 			"is_sender": is_sender,
-			"send_time": OS.get_ticks_msec()
+			"send_time": OS.get_ticks_msec() if is_sender else send_time
 		}
 	)
 
@@ -142,23 +143,32 @@ func read_p2p_packet():
 	if packet_size > 0:
 		var packet = Steam.readP2PPacket(packet_size, 0)
 		if packet.empty():
-			print("WARNING: read an empty packet with non-zero size!")
+			print_debug("WARNING: read an empty packet with non-zero size!")
 		var readable = bytes2var(packet.data.subarray(1, packet_size - 1))
-		# Debug prints
+
 		if verbose_prints and frame_counter == 0:
-			print("Packet: " + str(readable))
+			print_debug("Packet: " + str(readable))
+
 		if readable["type"] == "ping":
 			if readable["is_sender"]:
-				print("Ping received, sending back...")
-				send_ping(readable["send_type"], false)
+				print_debug("Ping received, sending back...")
+				send_ping(readable["send_type"], false, readable["send_time"])
 			else:
-				print("Round trip ping: " + str(OS.get_ticks_msec() - readable["send_time"]))
+				print_debug("Round trip ping: " + str(OS.get_ticks_msec() - readable["send_time"]))
 		elif readable["type"] == "handshake":
-			print("Handshake received")
+			print_debug("Handshake received")
 		elif readable["type"] == "start":
 			go_main(false)
-			print("Starting...")
+			print_debug("Starting...")
 		elif readable["type"] == "player":
+			if verbose_prints:
+				if last_update_time == -1:
+					last_update_time = OS.get_ticks_msec()
+				else:
+					print_debug(
+						"Delta since last ping: " + str(OS.get_ticks_msec() - last_update_time)
+					)
+					last_update_time = OS.get_ticks_msec()
 			p2p_data = readable
 
 
@@ -172,13 +182,13 @@ func send_p2p_packet(send_type, packet_data):
 # Steam signals
 func _on_join_requested(join_lobby_id, friend_id):
 	var host_name = Steam.getFriendPersonaName(friend_id)
-	print("Joining " + str(host_name))
+	print_debug("Joining " + str(host_name))
 	join_lobby(join_lobby_id)
 
 
 func _on_lobby_joined(new_lobby_id, _permissions, _locked, response):
 	if !host:
-		print("Joined")
+		print_debug("Joined")
 		if response != 1:
 			Globals.alert("Unsuccessful, please check the join code", "Error")
 			return

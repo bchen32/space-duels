@@ -27,12 +27,12 @@ func _input(event):
 
 
 func _on_join_pressed():
-	print("Join")
+	print_debug("Join")
 	get_tree().change_scene(join_scene_path)
 
 
 func _on_create_pressed():
-	print("Create")
+	print_debug("Create")
 	get_tree().change_scene(create_scene_path)
 
 

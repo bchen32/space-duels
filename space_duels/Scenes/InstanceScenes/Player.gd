@@ -135,9 +135,8 @@ func _physics_process(delta):
 	if Input.is_action_pressed("thrust"):
 		velocity += transform.basis.y * accel * delta
 
-	# Debug prints
 	if Globals.verbose_prints and Globals.frame_counter == 0:
-		print(velocity)
+		print_debug(velocity)
 
 	# Move
 	var rotation_speed = sqrt(
@@ -155,7 +154,7 @@ func _physics_process(delta):
 	var move_collision = move_and_collide(velocity * delta)
 	if move_collision:
 		queue_free()
-		print("Ship collide")
+		print_debug("Ship collide")
 	# Send p2p data
 	Globals.send_p2p_packet(Globals.UNRELIABLE_NO_DELAY, {"type": "player", "transform": transform})
 	# Mark visible enemies

@@ -66,7 +66,7 @@ func _on_lobby_update(_lobby_id, _changed_id, making_change_id, chat_state):
 
 
 func _on_p2p_session_request(remote_id):
-	print("Session request")
+	print_debug("Session request")
 	Steam.acceptP2PSessionWithUser(remote_id)
 	Globals.make_p2p_handshake()
 
@@ -148,7 +148,7 @@ func _on_send_pressed():
 func _on_start_pressed():
 	if Globals.lobby_enemy_id != 0:
 		# Only start if both players are there
-		print(Globals.lobby_enemy_id)
+		print_debug(Globals.lobby_enemy_id)
 		Globals.go_main(true)
 	else:
 		# Otherwise, print an error in chat
