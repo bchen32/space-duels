@@ -11,3 +11,5 @@ func _physics_process(_delta):
 		if data["shooting"]:
 			for laser in lasers:
 				laser.visible = true
+		if data["death"]:
+			queue_free()

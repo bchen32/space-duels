@@ -146,13 +146,17 @@ func _on_send_pressed():
 
 
 func _on_start_pressed():
-	if Globals.lobby_enemy_id != 0:
-		# Only start if both players are there
-		print_debug(Globals.lobby_enemy_id)
-		Globals.go_main(true)
+	if Globals.require_both:
+		if Globals.lobby_enemy_id != 0:
+			# Only start if both players are there
+			print_debug(Globals.lobby_enemy_id)
+			Globals.go_main(true)
+		else:
+			# Otherwise, print an error in chat
+			Globals.display_message(chat_box, "Both players must be here to start")
 	else:
-		# Otherwise, print an error in chat
-		Globals.display_message(chat_box, "Both players must be here to start")
+		# Start without both players for testing
+		Globals.go_main(true)
 
 
 func _on_text_entered(_text):

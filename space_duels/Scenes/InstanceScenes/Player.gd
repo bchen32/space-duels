@@ -11,6 +11,7 @@ onready var gun_pivots = [$Spaceship/GunPivotTop, $Spaceship/GunPivotBottom]
 onready var lasers = [$Spaceship/GunPivotTop/LaserTop, $Spaceship/GunPivotBottom/LaserBottom]
 
 # Physical characteristics
+export var health = 500
 export var damage = 1
 export var height = 8.5
 export var radius = 1
@@ -29,8 +30,6 @@ var turn_accel = torque / moment_inertia
 # Vel and angular vel
 var velocity = Vector3(0, 0, 0)
 var angular_velocity = Vector3()
-
-var shooting = false
 
 var enemy_marker_scene = preload("res://Scenes/InstanceScenes/EnemyMarker.tscn")
 var enemy_markers = []
@@ -56,9 +55,13 @@ func _ready():
 
 
 func _physics_process(delta):
-	# Create shooting area
+	var shooting = false
+	var hit = false
+	var death = false
+
 	for laser in lasers:
 		laser.visible = false
+	# Create shooting area
 	var collision_shape = ConvexPolygonShape.new()
 	var collision_points_octagon = [Vector3()]
 	var fov_shoot_theta = 0.01
@@ -103,7 +106,7 @@ func _physics_process(delta):
 				camera.global_transform.origin, body.global_transform.origin, [self]
 			)
 			if result and result.collider == body:
-				body.health -= damage
+				hit = true
 	if Input.is_action_pressed("pitch_up"):
 		if Input.is_action_pressed("stop_modifier"):
 			angular_velocity += stop(transform.basis.x, turn_accel.x * delta) * transform.basis.x
@@ -155,14 +158,27 @@ func _physics_process(delta):
 	transform = transform.orthonormalized()
 	# Check collisions and move
 	var move_collision = move_and_collide(velocity * delta)
-	if move_collision:
+
+	# Handle death
+	if health <= 0 or move_collision:
+		death = true
+		print_debug("Die")
 		queue_free()
-		print_debug("Ship collide")
-	# Send p2p data
+
+	# Handle p2p data
+	if Globals.p2p_data:
+		health -= Globals.p2p_data["damage"]
 	Globals.send_p2p_packet(
 		Globals.UNRELIABLE_NO_DELAY,
-		{"type": "player", "transform": transform, "shooting": shooting}
+		{
+			"type": "player",
+			"transform": transform,
+			"shooting": shooting,
+			"damage": damage if hit else 0,
+			"death": death
+		}
 	)
+
 	# Mark visible enemies
 	for enemy_marker in enemy_markers:
 		enemy_marker.queue_free()

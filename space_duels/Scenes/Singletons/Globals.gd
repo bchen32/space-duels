@@ -22,6 +22,7 @@ export var main_path = "res://Scenes/RunnableScenes/Main.tscn"
 # Debug vars
 export var screenshot_mode = false
 export var verbose_prints = true
+export var require_both = false
 export var print_frequency = 10
 var frame_counter = 0
 var last_update_time = -1
