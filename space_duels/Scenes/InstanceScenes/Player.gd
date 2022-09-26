@@ -30,6 +30,8 @@ var turn_accel = torque / moment_inertia
 var velocity = Vector3(0, 0, 0)
 var angular_velocity = Vector3()
 
+var shooting = false
+
 var enemy_marker_scene = preload("res://Scenes/InstanceScenes/EnemyMarker.tscn")
 var enemy_markers = []
 
@@ -88,6 +90,7 @@ func _physics_process(delta):
 	look_at_no_spin(gun_pivots[1], gun_look_at)
 	# Controls
 	if Input.is_action_pressed("fire"):
+		shooting = true
 		for laser in lasers:
 			laser.visible = true
 		var bodies = shoot_area.get_overlapping_bodies()
@@ -156,7 +159,10 @@ func _physics_process(delta):
 		queue_free()
 		print_debug("Ship collide")
 	# Send p2p data
-	Globals.send_p2p_packet(Globals.UNRELIABLE_NO_DELAY, {"type": "player", "transform": transform})
+	Globals.send_p2p_packet(
+		Globals.UNRELIABLE_NO_DELAY,
+		{"type": "player", "transform": transform, "shooting": shooting}
+	)
 	# Mark visible enemies
 	for enemy_marker in enemy_markers:
 		enemy_marker.queue_free()
