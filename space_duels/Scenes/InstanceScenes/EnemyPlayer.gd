@@ -8,8 +8,7 @@ func _physics_process(_delta):
 	var data = Globals.p2p_data
 	if data:
 		transform = data["transform"]
-		if data["shooting"]:
-			for laser in lasers:
-				laser.visible = true
+		for laser in lasers:
+			laser.visible = data["shooting"]
 		if data["death"]:
 			queue_free()

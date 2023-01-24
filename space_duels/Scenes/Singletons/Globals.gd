@@ -148,7 +148,7 @@ func read_p2p_packet():
 		var readable = bytes2var(packet.data.subarray(1, packet_size - 1))
 
 		if verbose_prints and frame_counter == 0:
-			print_debug("Packet: " + str(readable))
+			print_debug("Packet recv: " + str(readable))
 
 		if readable["type"] == "ping":
 			if readable["is_sender"]:
