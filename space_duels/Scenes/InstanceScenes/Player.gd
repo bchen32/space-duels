@@ -5,7 +5,6 @@ onready var crosshair_circle = $Overlay/CrosshairCircle
 onready var crosshair_cross = $Overlay/CrosshairCross
 onready var shoot_area_circle = $Overlay/ShootAreaCircle
 onready var camera = $Camera
-onready var shoot_area = $Camera/ShootArea
 onready var vision_area = $Camera/VisionArea
 onready var gun_pivots = [$Spaceship/GunPivotTop, $Spaceship/GunPivotBottom]
 onready var lasers = [$Spaceship/GunPivotTop/LaserTop, $Spaceship/GunPivotBottom/LaserBottom]
@@ -62,34 +61,10 @@ func _physics_process(delta):
 
 	for laser in lasers:
 		laser.visible = false
-	# Create shooting area
-	var collision_shape = ConvexPolygonShape.new()
-	var collision_points_octagon = [Vector3()]
-	var fov_shoot_theta = 0.01
-	var fov_shoot_length = 10000
-	var octagon_collision_radius = atan(fov_shoot_theta) * fov_shoot_length
-	var mouse_pos = crosshair_circle.rect_position + (crosshair_circle.rect_size / 2)
-	var mouse_vector = (camera.project_ray_normal(mouse_pos) - transform.basis.y) * fov_shoot_length
-	var mouse_vector_x = (
-		mouse_vector.dot(transform.basis.x)
-		/ (transform.basis.x.length() * transform.basis.x.length())
-	)
-	var mouse_vector_z = (
-		mouse_vector.dot(transform.basis.z)
-		/ (transform.basis.z.length() * transform.basis.z.length())
-	)
-	for i in range(8):
-		collision_points_octagon.append(
-			Vector3(
-				mouse_vector_x + octagon_collision_radius * cos(i * PI / 4),
-				fov_shoot_length,
-				mouse_vector_z + octagon_collision_radius * sin(i * PI / 4)
-			)
-		)
-	collision_shape.points = collision_points_octagon
-	shoot_area.get_node("CollisionShape").set_shape(collision_shape)
-	var gun_look_at = camera.project_ray_normal(mouse_pos) * fov_shoot_length * 50
+	
 	# Point guns at target
+	var mouse_pos = crosshair_circle.rect_position + (crosshair_circle.rect_size / 2)
+	var gun_look_at = camera.project_ray_normal(mouse_pos) * 500000
 	look_at_no_spin(gun_pivots[0], gun_look_at)
 	look_at_no_spin(gun_pivots[1], gun_look_at)
 	# Controls
@@ -97,10 +72,15 @@ func _physics_process(delta):
 		shooting = true
 		for laser in lasers:
 			laser.visible = true
-		var bodies = shoot_area.get_overlapping_bodies()
+		var bodies = vision_area.get_overlapping_bodies()
 		for body in bodies:
 			if body == self or body.get_collision_layer() != 1:
 				continue
+			# Check if player is aiming at body
+			#Plan is
+			#Get vector pointing to body, project onto normalized gun_look_at,
+			#get diff between first vector and projection and check that length
+			#is less than 1
 			# Raycast check for visibility
 			var space_state = get_world().direct_space_state
 			var result = space_state.intersect_ray(
