@@ -18,6 +18,7 @@ export var radius = 1
 export var mass = 1000
 export var thrust = 50000
 export var torque = Vector3(10000, 1000, 10000)
+export var ang_vel_max = Vector3(PI, 4 * PI, PI)
 
 var moment_inertia = Vector3(
 	0.25 * mass * radius * radius + mass * height * height / 12,
@@ -137,6 +138,12 @@ func _physics_process(delta):
 			angular_velocity += stop(transform.basis.y, turn_accel.y * delta) * transform.basis.y
 		else:
 			angular_velocity -= transform.basis.y * turn_accel.y * delta
+	
+	angular_velocity = Vector3(
+		clamp(angular_velocity.x, -ang_vel_max.x, ang_vel_max.x),
+		clamp(angular_velocity.y, -ang_vel_max.y, ang_vel_max.y),
+		clamp(angular_velocity.z, -ang_vel_max.z, ang_vel_max.z)
+	)
 
 	if Input.is_action_pressed("thrust"):
 		velocity += transform.basis.y * accel * delta
