@@ -61,10 +61,12 @@ func _physics_process(delta):
 
 	for laser in lasers:
 		laser.visible = false
-	
+
 	# Point guns at target
 	var mouse_pos = crosshair_circle.rect_position + (crosshair_circle.rect_size / 2)
-	var gun_look_at = camera.project_ray_normal(mouse_pos) * 500000
+	var gun_look_at = camera.project_ray_normal(mouse_pos)
+	var pivot_points = [gun_pivots[0].global_transform.origin, gun_pivots[1].global_transform.origin]
+	var gun_endpoints = [pivot_points[0] + gun_look_at * 50000, pivot_points[1] + gun_look_at * 50000]
 	look_at_no_spin(gun_pivots[0], gun_look_at)
 	look_at_no_spin(gun_pivots[1], gun_look_at)
 	# Controls
@@ -76,18 +78,18 @@ func _physics_process(delta):
 		for body in bodies:
 			if body == self or body.get_collision_layer() != 1:
 				continue
-			# Check if player is aiming at body
-			#Plan is
-			#Get vector pointing to body, project onto normalized gun_look_at,
-			#get diff between first vector and projection and check that length
-			#is less than 1
-			# Raycast check for visibility
+			# Raycast from each gun pivot to check for hit
 			var space_state = get_world().direct_space_state
-			var result = space_state.intersect_ray(
-				camera.global_transform.origin, body.global_transform.origin, [self]
+			var results = [{}, {}]
+			results[0] = space_state.intersect_ray(
+				pivot_points[0], gun_endpoints[0], [self]
 			)
-			if result and result.collider == body:
-				hit = true
+			results[1] = space_state.intersect_ray(
+				pivot_points[1], gun_endpoints[1], [self]
+			)
+			for result in results:
+				if result and result.collider == body:
+					hit = true
 	if Input.is_action_pressed("pitch_up"):
 		if Input.is_action_pressed("stop_modifier"):
 			angular_velocity += stop(transform.basis.x, turn_accel.x * delta) * transform.basis.x
@@ -118,7 +120,7 @@ func _physics_process(delta):
 			angular_velocity += stop(transform.basis.y, turn_accel.y * delta) * transform.basis.y
 		else:
 			angular_velocity -= transform.basis.y * turn_accel.y * delta
-	
+
 	angular_velocity = Vector3(
 		clamp(angular_velocity.x, -ang_vel_max.x, ang_vel_max.x),
 		clamp(angular_velocity.y, -ang_vel_max.y, ang_vel_max.y),
@@ -132,13 +134,7 @@ func _physics_process(delta):
 		print_debug(velocity)
 
 	# Move
-	var rotation_speed = sqrt(
-		(
-			angular_velocity.x * angular_velocity.x
-			+ angular_velocity.y * angular_velocity.y
-			+ angular_velocity.z * angular_velocity.z
-		)
-	)
+	var rotation_speed = angular_velocity.length()
 	var rotation_axis = angular_velocity.normalized()
 	if !angular_velocity.is_equal_approx(Vector3()):
 		rotate(rotation_axis, rotation_speed * delta)
