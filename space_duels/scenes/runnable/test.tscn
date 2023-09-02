@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://scenes/runnable/test.gd" type="Script" id=1]
+[ext_resource path="res://scenes/instance/target.tscn" type="PackedScene" id=2]
 [ext_resource path="res://space_env.tres" type="Environment" id=3]
+[ext_resource path="res://scenes/instance/player.tscn" type="PackedScene" id=4]
 [ext_resource path="res://scenes/instance/asteroid.tscn" type="PackedScene" id=5]
+[ext_resource path="res://scenes/instance/enemy_player.tscn" type="PackedScene" id=6]
 
 [node name="Main" type="Spatial"]
 script = ExtResource( 1 )
@@ -16,3 +19,12 @@ environment = ExtResource( 3 )
 transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 120, 0, 0 )
 fov = 90.0
 far = 10000.0
+
+[node name="Target" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, -10, 0 )
+
+[node name="Player" parent="." instance=ExtResource( 4 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 0, 0 )
+
+[node name="Enemy" parent="." instance=ExtResource( 6 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 100, 20, 0 )
